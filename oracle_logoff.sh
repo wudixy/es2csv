@@ -1,5 +1,7 @@
 #!/bin/sh
 tmpdir=/tmp
+csvdir=./csv
+spdatadir=./tmp
 index=bimap-sa-oracle-*
 url=http://84.239.18.44:9200
 topic=oracle_logoff
@@ -80,8 +82,7 @@ qsl=' {
       "date_histogram": {
         "field": "logtime",
         "interval": "1h",
-        "min_doc_count": 1,
-        "time_zone": "Asia/Shanghai"
+        "min_doc_count": 1
       }
     }
   },
@@ -129,6 +130,6 @@ echo ${qsl} > ${tmpdir}/search_${topic}.json
 
 curl -X GET -u readonly:123456 ${url}/${index}/_search  -H 'Content-Type: application/json' -d @${tmpdir}/search_${topic}.json > ${tmpdir}/${topic}.json
 
-python esJson2csv -j ${tmpdir}/${topic}.json -o ${topic}.csv getagg -g logtime,host,service_name,userid,logoff_dead -d logoff_lread,logoff_lwrite,logoff_pread,sessioncpu
+python esJson2csv -j ${tmpdir}/${topic}.json -o ${csvdir}/${topic}.csv getagg -g logtime,host,service_name,userid,logoff_dead -d logoff_lread,logoff_lwrite,logoff_pread,sessioncpu
 
-python splitcsv.py -f ${topic}.csv -s 1  -p ${topic} -S $begindate -o ./tmp
+python splitcsv.py -f ${csvdir}/${topic}.csv -s 1 -t 0 -p ${topic} -S $begindate -o ${spdatadir}

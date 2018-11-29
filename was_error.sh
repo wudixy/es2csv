@@ -1,5 +1,7 @@
 #!/bin/sh
 tmpdir=/tmp
+csvdir=./csv
+spdatadir=./tmp
 index=bimap-sa-was-*
 url=http://84.239.18.44:9200
 topic=was_error
@@ -131,5 +133,6 @@ echo ${qsl} > ${tmpdir}/search_${topic}.json
 
 curl -X GET -u readonly:123456 ${url}/${index}/_search  -H 'Content-Type: application/json' -d @${tmpdir}/search_${topic}.json > ${tmpdir}/${topic}.json
 
-python esJson2csv -j ${tmpdir}/${topic}.json -o ${topic}.csv getagg -c -g logtime,host -p err -d HMGR0152W,J2CA0056I,WSVR0605W,java.lang.OutOfMemoryError,java.lang.StackOverflowError,manyopenfiles,wfxy
-#python splitcsv.py -f ${topic}.csv -s 1  -p ${topic} -S $begindate -o ./tmp
+python esJson2csv -j ${tmpdir}/${topic}.json -o ${csvdir}/${topic}.csv getagg -c -g logtime,host -p err -d HMGR0152W,J2CA0056I,WSVR0605W,java.lang.OutOfMemoryError,java.lang.StackOverflowError,manyopenfiles,wfxy
+
+python splitcsv.py -f ${csvdir}/${topic}.csv -s 1 -t 0 -p ${topic} -S $begindate -o ${spdatadir}

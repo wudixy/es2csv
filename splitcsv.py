@@ -53,22 +53,6 @@ def main():
     #parser.set_defaults(func=scsv)
     parser.set_defaults(func=splitCsv)
 
-    """
-    subparsers = parser.add_subparsers(title="get hits", description="valid subcommands", help='sub-command help')
-    # create the parser for the "action" command
-    # get hits
-    parser_a = subparsers.add_parser('gethit', help='get hit detail')
-    parser_a.add_argument('-fields', default=None, help='field list string')
-    parser_a.add_argument('-ffile', default=None, help='field list file')
-    parser_a.set_defaults(func=hit2csv)
-
-    # get agg 设置
-    parser_b = subparsers.add_parser('getagg', help='export help')
-    parser_b.add_argument('-glist', required=True, default=None, help='group by field list;split by ,')
-    parser_b.add_argument('-vlist', required=True, default=None, help='value by field list;split by ,')
-    parser_b.set_defaults(func=aggJson2csv)
-    """
-
     args = parser.parse_args()
 
     args.func(args)
