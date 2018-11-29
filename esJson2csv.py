@@ -2,17 +2,6 @@
 import json
 import argparse
 
-"""
-flist = "hit['_source']['bimap']['host'],\
-hit['_source']['bimap']['ip'],\
-hit['_source']['bimap']['app'],\
-hit['_source']['auditd']['log']['ses'],\
-hit['_source']['auditd']['log']['msg']['addr'],\
-hit['_source']['auditd']['log']['auid']"
-
-grouplist = ['byhost','bysname','byuid']
-valuelist = ['lread','lwrite']
-"""
 
 def readFlist(fname):
     """read field list from file"""
@@ -53,7 +42,10 @@ def getAgg(jsobj,glist,vlist,data,dprefix='',getcount=False):
         #print flag
         tmpjs = jsobj[flag]['buckets']
         for b in tmpjs:
-            data[flag]= str(b['key'])
+            if "key_as_string" in b.keys():
+                data[flag]= b['key_as_string']
+            else:
+                data[flag]= str(b['key'])
             getAgg(b,glist,vlist,data,dprefix,getcount)
             #print data
     else:
