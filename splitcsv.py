@@ -22,6 +22,9 @@ def str2unixTime(datestr, dateformat):
 def splitCsv(args):
     f = open(args.file)
     dts = csv.reader(f)
+    if args.headline:
+        # 如果包含head字段，剔除
+        dts.pop(0)
     keyindex = args.splitindex
     if args.dateformat:
         dateformat = args.dateformat
@@ -50,6 +53,7 @@ def main():
     parser.add_argument('-F','--dateformat',default="", help='%Y-%m-%dT%H:%M:%S.%fZ')
     parser.add_argument('-p','--prefix', default="", help='save file name prefix')
     parser.add_argument('-S','--suffix', default="", help='save file name prefix')
+    parser.add_argument('-l','--headline', action='store_true', help='output file include head line')
     #parser.set_defaults(func=scsv)
     parser.set_defaults(func=splitCsv)
 
