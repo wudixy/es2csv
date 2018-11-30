@@ -72,6 +72,7 @@ def getAgg(jsobj,glist,vlist,data,dprefix='',getcount=False):
 
 
 def hit2csv(args):
+    print args
     jsfile = args.jsonfile
     if args.fields:
         fieldlist = args.fields
@@ -81,6 +82,8 @@ def hit2csv(args):
     dts = readESJson(jsfile, fieldlist)
     if args.outputfile:
         f = open(args.outputfile,'w')
+        if args.headline:
+            f.write(args.headline+'\n')
         for d in dts:
             f.write(','.join(d)+'\n')
         f.close()
@@ -102,6 +105,8 @@ def aggJson2csv(args):
     getAgg(js,glist,dlist,data,args.prefix,args.count)
     if args.outputfile:
         f = open(args.outputfile,'w')
+        if args.headline:
+            f.write(args.headline+'\n')
         for d in aggres:
             f.write(','.join(d)+'\n')
         f.close()
@@ -113,6 +118,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-j','--jsonfile', default="es.json", help='json File ')
     parser.add_argument('-o','--outputfile', default="search.csv", help='Output File ')
+    #parser.add_argument('-l','--headline', action='store_true', help='output file include head line')
+    parser.add_argument('-l','--headline', default="", help='output file include head line')
 
     #添加子命令
     subparsers = parser.add_subparsers(title="get hits",description="valid subcommands",help='sub-command help')
