@@ -78,7 +78,6 @@ def hit2csv(args):
         fieldlist = args.fields
     #elif args.fieldsFile:
     #    fieldlist = readFlist(args.fieldsFile)
-    #print fieldlist
     dts = readESJson(jsfile, fieldlist)
     if args.outputfile:
         f = open(args.outputfile,'w')
@@ -138,9 +137,7 @@ def main():
     parser_b.add_argument('-c', '--count',action='store_true',  help='get doc_count, not def get value')
     parser_b.set_defaults(func=aggJson2csv)
 
-
     args = parser.parse_args()
-
     args.func(args)
 
 main()
