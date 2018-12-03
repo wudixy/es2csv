@@ -12,10 +12,15 @@ else
     csvdir=./csv
 fi
 
+if [ $ESURL ]; then
+    url=${ESURL}
+else
+    url=http://84.239.18.44:9200
+fi
+
 spdatadir=${csvdir}/byhost
 
 index=bimap-sa-oracle-*
-url=http://84.239.18.44:9200
 topic=oracle_logoff
 
 nowdate=$(date +%Y%m%d)
@@ -140,7 +145,8 @@ qsl=${qsl//#begindate#/${begindate}}
 qsl=${qsl//#enddate#/${enddate}}
 echo ${qsl} > ${tmpdir}/search_${topic}.json
 
-curl -X GET -u readonly:123456 ${url}/${index}/_search  -H 'Content-Type: application/json' -d @${tmpdir}/search_${topic}.json > ${tmpdir}/${topic}.json
+#curl -X GET -u readonly:123456 ${url}/${index}/_search  -H 'Content-Type: application/json' -d @${tmpdir}/search_${topic}.json > ${tmpdir}/${topic}.json
+curl -X GET -u ${ESUSER}:${ESPWD} ${url}/${index}/_search  -H 'Content-Type: application/json' -d @${tmpdir}/search_${topic}.json > ${tmpdir}/${topic}.json
 
 python esJson2csv -j ${tmpdir}/${topic}.json -o ${csvdir}/${topic}.csv -l "logtime,host,service_name,userid,logoff_dead,logoff_lread,logoff_lread,logoff_lwrite,logoff_pread,sessioncpu" getagg -g logtime,host,service_name,userid,logoff_dead -d logoff_lread,logoff_lwrite,logoff_pread,sessioncpu
 

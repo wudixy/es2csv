@@ -35,3 +35,11 @@ splitcsv by field
 6. -p outputfile prefix,defautl is null
 7. -S outputfile suffix,default is null
 8. -l headline flag,if use headline,skip 0 row
+
+
+## Demo useage
+
+1. source ./esenv.sh
+2. ./linux_logon.sh 20181201 to make linux logon info from linuxaudit
+3. such as:  oracle_logoff.sh  was_error.sh  windows_logon.sh
+4. you can use ./mdays.sh linux_logon.sh 20181201 20181231 to run 201812 datas
