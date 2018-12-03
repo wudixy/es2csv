@@ -72,7 +72,7 @@ def getAgg(jsobj,glist,vlist,data,dprefix='',getcount=False):
 
 
 def hit2csv(args):
-    print args
+    # print args
     jsfile = args.jsonfile
     if args.fields:
         fieldlist = args.fields
