@@ -1,7 +1,18 @@
 #!/bin/sh
-tmpdir=/tmp
-csvdir=./csv
-spdatadir=./tmp
+if [ $JSONTMP ]; then
+    tmpdir=$JSONTMP
+else
+    tmpdir=./json
+fi
+
+if [ $CSVFLODER ]; then
+    csvdir=$CSVFLODER
+else
+    csvdir=./csv
+fi
+
+spdatadir=${csvdir}/byhost
+
 index=bimap-sa-auditd-*
 url=http://84.239.18.44:9200
 topic=linux_logon
@@ -69,6 +80,6 @@ echo ${qsl} > ${tmpdir}/search_${topic}.json
 
 curl -X GET -u readonly:123456 ${url}/${index}/_search  -H 'Content-Type: application/json' -d @${tmpdir}/search_${topic}.json > ${tmpdir}/${topic}.json
 
-python esJson2csv -j ${tmpdir}/${topic}.json -o ${csvdir}/${topic}.csv gethit -f "hit['_source']['logtime'],hit['_source']['bimap']['host'],hit['_source']['bimap']['ip'],hit['_source']['bimap']['app'],hit['_source']['auditd']['log']['ses'],hit['_source']['auditd']['log']['msg']['addr'],hit['_source']['auditd']['log']['auid']"
+python esJson2csv -j ${tmpdir}/${topic}.json -o ${csvdir}/${topic}.csv -l logtime,host,ip,app,ses,addr,auid gethit -f "hit['_source']['logtime'],hit['_source']['bimap']['host'],hit['_source']['bimap']['ip'],hit['_source']['bimap']['app'],hit['_source']['auditd']['log']['ses'],hit['_source']['auditd']['log']['msg']['addr'],hit['_source']['auditd']['log']['auid']"
 
-python splitcsv.py -f ${csvdir}/${topic}.csv -s 1 -t 0 -p ${topic} -S $begindate -o ${spdatadir}
+python splitcsv.py -f ${csvdir}/${topic}.csv -l -s 1 -t 0 -p ${topic} -S $begindate -o ${spdatadir}

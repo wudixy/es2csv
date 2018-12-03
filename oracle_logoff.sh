@@ -1,7 +1,19 @@
 #!/bin/sh
-tmpdir=/tmp
-csvdir=./csv
-spdatadir=./tmp
+
+if [ $JSONTMP ]; then
+    tmpdir=$JSONTMP
+else
+    tmpdir=./json
+fi
+
+if [ $CSVFLODER ]; then
+    csvdir=$CSVFLODER
+else
+    csvdir=./csv
+fi
+
+spdatadir=${csvdir}/byhost
+
 index=bimap-sa-oracle-*
 url=http://84.239.18.44:9200
 topic=oracle_logoff
