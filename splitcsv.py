@@ -22,9 +22,10 @@ def str2unixTime(datestr, dateformat):
 def splitCsv(args):
     f = open(args.file)
     dts = csv.reader(f)
+    dts = list(dts)
     if args.headline:
         # 如果包含head字段，剔除
-        dts.pop(0)
+        head = dts.pop(0)
     keyindex = args.splitindex
     if args.dateformat:
         dateformat = args.dateformat
@@ -33,6 +34,8 @@ def splitCsv(args):
     sa = sorted(dts, key=operator.itemgetter(keyindex))
     for g, v in itertools.groupby(sa, key=operator.itemgetter(keyindex)):
         csvf = open(os.path.join(args.outdir, '%s-%s-%s.csv'%(args.prefix, g, args.suffix)),'w')
+        if args.headline and head:
+            csvf.write(','.join(head) + '\n')
         for data in list(v):
             if args.dateindex >= 0:
                 # data[args.dateindex] = str2epoch(data[args.dateindex], dateformat)

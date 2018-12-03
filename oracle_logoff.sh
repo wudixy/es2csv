@@ -130,6 +130,6 @@ echo ${qsl} > ${tmpdir}/search_${topic}.json
 
 curl -X GET -u readonly:123456 ${url}/${index}/_search  -H 'Content-Type: application/json' -d @${tmpdir}/search_${topic}.json > ${tmpdir}/${topic}.json
 
-python esJson2csv -j ${tmpdir}/${topic}.json -o ${csvdir}/${topic}.csv getagg -g logtime,host,service_name,userid,logoff_dead -d logoff_lread,logoff_lwrite,logoff_pread,sessioncpu
+python esJson2csv -j ${tmpdir}/${topic}.json -o ${csvdir}/${topic}.csv -l "logtime,host,service_name,userid,logoff_dead,logoff_lread,logoff_lread,logoff_lwrite,logoff_pread,sessioncpu" getagg -g logtime,host,service_name,userid,logoff_dead -d logoff_lread,logoff_lwrite,logoff_pread,sessioncpu
 
-python splitcsv.py -f ${csvdir}/${topic}.csv -s 1 -t 0 -p ${topic} -S $begindate -o ${spdatadir}
+python splitcsv.py -f ${csvdir}/${topic}.csv -l -s 1 -t 0 -p ${topic} -S $begindate -o ${spdatadir}

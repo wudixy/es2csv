@@ -61,6 +61,6 @@ echo ${qsl} > ${tmpdir}/search_${topic}.json
 
 curl -X GET -u readonly:123456 ${url}/${index}/_search  -H 'Content-Type: application/json' -d @${tmpdir}/search_${topic}.json > ${tmpdir}/${topic}.json
 
-python esJson2csv -j ${tmpdir}/${topic}.json -o ${csvdir}/${topic}.csv gethit -f "hit['_source']['logtime'],hit['_source']['bimap']['host'],hit['_source']['bimap']['ip'],hit['_source']['bimap']['app'],hit['_source']['event_data']['IpAddress'],hit['_source']['event_data']['TargetUserName']"
+python esJson2csv -j ${tmpdir}/${topic}.json -o ${csvdir}/${topic}.csv -l "logtime,host,ip,app,TargetLogonId,IpAddress,TargetUsername" gethit -f "hit['_source']['logtime'],hit['_source']['bimap']['host'],hit['_source']['bimap']['ip'],hit['_source']['bimap']['app'],hit['_source']['event_data']['TargetLogonId'],hit['_source']['event_data']['IpAddress'],hit['_source']['event_data']['TargetUserName']"
 
-python splitcsv.py -f ${csvdir}/${topic}.csv -s 1 -t 0 -p ${topic} -S $begindate -o ${spdatadir}
+python splitcsv.py -f ${csvdir}/${topic}.csv -l -s 1 -t 0 -p ${topic} -S $begindate -o ${spdatadir}

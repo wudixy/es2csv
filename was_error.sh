@@ -133,6 +133,6 @@ echo ${qsl} > ${tmpdir}/search_${topic}.json
 
 curl -X GET -u readonly:123456 ${url}/${index}/_search  -H 'Content-Type: application/json' -d @${tmpdir}/search_${topic}.json > ${tmpdir}/${topic}.json
 
-python esJson2csv -j ${tmpdir}/${topic}.json -o ${csvdir}/${topic}.csv getagg -c -g logtime,host -p err -d HMGR0152W,J2CA0056I,WSVR0605W,java.lang.OutOfMemoryError,java.lang.StackOverflowError,manyopenfiles,wfxy
+python esJson2csv -j ${tmpdir}/${topic}.json -o ${csvdir}/${topic}.csv -l "logtime,host,HMGR0152W,J2CA0056I,WSVR0605W,java.lang.OutOfMemoryError,java.lang.StackOverflowError,manyopenfiles,ViolateProtocol" getagg -c -g logtime,host -p err -d HMGR0152W,J2CA0056I,WSVR0605W,java.lang.OutOfMemoryError,java.lang.StackOverflowError,manyopenfiles,wfxy
 
-python splitcsv.py -f ${csvdir}/${topic}.csv -s 1 -t 0 -p ${topic} -S $begindate -o ${spdatadir}
+python splitcsv.py -f ${csvdir}/${topic}.csv -l -s 1 -t 0 -p ${topic} -S $begindate -o ${spdatadir}
