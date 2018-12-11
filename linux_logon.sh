@@ -140,4 +140,4 @@ python esJson2csv -j ${tmpdir}/${topic}.json -o ${csvdir}/${topic}.csv -l logout
 source /root/ipocPython/bin/activate
 topic1=linux_logon
 python transcsv.py -f ${csvdir}/${topic1}.csv -j -k host,ses -J ${csvdir}/${topic}.csv  -o ${csvdir}/linux_login.csv
-python transcsv.py -f ${csvdir}/${topic1}.csv -j -k host,ses -J ${csvdir}/${topic}.csv  -o ${spdatadir} -d logtime,logouttime -s host --prefix linux_login --suffix $begindate
+python transcsv.py -f ${csvdir}/${topic1}.csv -j -k host,ses -J ${csvdir}/${topic}.csv --filter "dp['logtime']<=dp['logouttime']" --sortkey host,logtime,ses,logouttime --asclist 1,1,1,1 --removeby logtime,host,ses -o ${spdatadir} -d logtime,logouttime -s host --prefix linux_login --suffix $begindate

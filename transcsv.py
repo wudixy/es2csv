@@ -32,9 +32,17 @@ csvjoin(r'E:\\ShareDisk\\es2csv.20181210\\es2csv\\csv\\linux_logon.csv',r'E:\\Sh
 )
 """
 
+def filter(dp, expression):
+    if expression:
+        try:
+            outdp = dp[eval(expression)]
+        except Exception,e:
+            print str(e)
+            outdp = dp
+        return outdp
+
 
 def output(indp, out, splitindex=None, datefields=None, dateformat='%Y-%m-%dT%H:%M:%S.%fZ', prefix='', suffix='', removedup=True):
-    #dfleft = pd.read_csv(r'E:\\ShareDisk\\es2csv.20181210\\es2csv\\csv\\linux_logon.csv', header=0)
     if removedup:
         indp.drop_duplicates()
     if datefields:
@@ -50,14 +58,14 @@ def output(indp, out, splitindex=None, datefields=None, dateformat='%Y-%m-%dT%H:
             indp[d] = indp[d].apply(func)
             #indp[d] = indp[d].astype(object)
     if splitindex:
-        indp = indp.set_index('host')
+        #indp = indp.set_index('host')
         # print indp
-        keys = indp.index.unique()
+        keys = indp[splitindex].unique()
         for k in keys:
-            tmp = indp.loc[k]
+            tmp = indp[indp[splitindex]==k]
             #df = df.sort_values(by='logtime')
             tmp.to_csv(os.path.join(out, '%s-%s-%s.csv' %
-                                    (prefix, k, suffix)), index=True)
+                                    (prefix, k, suffix)), index=False)
     else:
         indp.to_csv(out, index=False)
 
@@ -73,35 +81,41 @@ def main():
     parser = argparse.ArgumentParser(
         usage='%(prog)s [-h] -f csvfile <-o outputfile [-s splitkey] [-d datefields] [-F dateformat] [--prefix] [--suffix] [--removedup] > [-j join -k joinkey -J joinfile -m joinmethod]'
     )
-    parser.add_argument('-f', '--csvfile', required=True,
-                        help='csv File,first line is head')
+    parser.add_argument('-f', '--csvfile', required=True, help='csv File,first line is head')
 
-    parser.add_argument('-o', '--outputfile', required=True,
-                        help='if set splitindex,this option is dir')
-    #parser.add_argument('-s','--splitindex',default=0, type=int,  help='split field index,default 0')
-    parser.add_argument(
-        '-s', '--splitkey', help='if set splitfield, output is mutli csv file by set key')
-    parser.add_argument(
-        '-d', '--datefields', help='change this field to epoch, mutli filed split by ,')
+    parser.add_argument('-o', '--outputfile', required=True, help='if set splitindex,this option is dir')
+    # 按照指定的key将文件拆分为多个csv文件
+    parser.add_argument('-s', '--splitkey', help='if set splitfield, output is mutli csv file by set key')
+    # 将date类型的1个或多个字段转换为epoch时间 
+    parser.add_argument('-d', '--datefields', help='change this field to epoch, mutli filed split by ,')
     parser.add_argument('-F', '--dateformat', default="%Y-%m-%dT%H:%M:%S.%fZ",
                         help='default is %%Y-%%m-%%dT%%H:%%M:%%S.%%fZ')
+    #输出文件的前缀和后缀,仅在拆分文件时使用
     parser.add_argument('--prefix', default="",
                         help='save file name prefix, must set splitindex')
     parser.add_argument('--suffix', default="",
                         help='save file name suffix, must set splitindex')
-    parser.add_argument('--removedup', action='store_true',
-                        help='remove duplicate row')
-
+    # 按照1个或多个key，joincsv文件
     parser.add_argument('-j', '--join', action='store_true',
                         help='join 2 csv file by key')
     parser.add_argument('-k', '--keys',  help='keys')
     parser.add_argument('-J', '--joincsvfile', help='join csv file')
     parser.add_argument('-m', '--joinmethod', choices=[
                         'left', 'right', 'outer', 'inner'], default='left', help='join method')
+    # 根据表达式过滤数据
+    parser.add_argument('--filter', default=None, help="you can use express like:dp['field_a']>dp['field_b']")
+    # 按照sortkey进行排顺序，asclist中0是降序，1是升序
+    parser.add_argument('--sortkey', default=None, help="must key split by ,")
+    parser.add_argument('--asclist', default=None, help="0:desc;1:asc;must key use , split,like<0,0,1>")
+    # 按照指定的1个多多个字段去重
+    parser.add_argument('--removeby', default=None, help='remove duplicate row')
+    parser.add_argument('--keep', choices=[ 'first', 'last'], default='first', help='keep row')
+    # 行完全相同时去重
+    parser.add_argument('-r','--removedup', action='store_true', help='remove all field duplicate row')
 
     args = parser.parse_args()
     # args.func(args)
-    print args
+    # print args
 
     infile = pd.read_csv(args.csvfile, header=0)
     if args.join:
@@ -109,10 +123,22 @@ def main():
             rfile = pd.read_csv(args.joincsvfile, header=0)
             dfout = csvjoin(infile, rfile, args.keys.split(
                 ','), drop_dupl=True, howjoin=args.joinmethod)
+    if args.filter:
+        dfout = filter(dfout, args.filter)
+
+    if args.sortkey:
+        sk = args.sortkey.split(',')
+        if args.asclist:
+            al = map(int,args.asclist.split(','))
+        else:
+            al = [1 for n in range(len(sk))]
+        dfout = dfout.sort_values(by=sk,ascending=al)
+
+    if args.removeby:
+        dfout = dfout.drop_duplicates(args.removeby.split(','), keep=args.keep)
 
     output(dfout, args.outputfile, splitindex=args.splitkey, datefields=args.datefields,
            dateformat=args.dateformat, prefix=args.prefix, suffix=args.suffix, removedup=args.removedup)
 
 
 main()
-
