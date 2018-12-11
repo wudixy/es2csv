@@ -43,3 +43,8 @@ splitcsv by field
 2. ./linux_logon.sh 20181201 to make linux logon info from linuxaudit
 3. such as:  oracle_logoff.sh  was_error.sh  windows_logon.sh
 4. you can use ./mdays.sh linux_logon.sh 20181201 20181231 to run 201812 datas
+
+
+## 20181211
+1. 增加join,过滤，去重功能
+2. 将linux_logon和linux_logout合并，join后生成linux_login
