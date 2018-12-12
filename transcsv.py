@@ -39,11 +39,17 @@ def filter(dp, expression):
             outdp = dp
         return outdp
 
+def fillnull(dp, filldict):
+    try:
+        d = eval(filldict)
+        outdp = dp.fillna(d)
+    except Exception,e:
+        print str(e)
+        outdp = dp
+    return outdp
+
 
 def output(indp, out, splitindex=None, datefields=None, dateformat='%Y-%m-%dT%H:%M:%S.%fZ', prefix='', suffix='', removedup=True):
-    # 根据所有字段去重
-    if removedup:
-        indp.drop_duplicates()
     # 有日期类型需要转换
     if datefields:
         # dateformat="%Y-%m-%dT%H:%M:%S.%fZ"
@@ -58,6 +64,9 @@ def output(indp, out, splitindex=None, datefields=None, dateformat='%Y-%m-%dT%H:
         for d in datefields:
             indp[d] = indp[d].apply(func)
             #indp[d] = indp[d].astype(object)
+    # 根据所有字段去重
+    if removedup:
+        indp = indp.drop_duplicates()
     if splitindex:
         #需要按照指定key拆分文件
         #indp = indp.set_index('host')
@@ -116,6 +125,10 @@ def main():
     # 行完全相同时去重
     parser.add_argument('-r','--removedup', action='store_true', help='remove all field duplicate row')
 
+    # 空值填充
+    parser.add_argument('--nulldict', default=None, help="like {'fileda':123,'fieldb':'abc'} fill null value")
+
+
     args = parser.parse_args()
     # args.func(args)
     # print args
@@ -126,6 +139,10 @@ def main():
             rfile = pd.read_csv(args.joincsvfile, header=0)
             dfout = csvjoin(infile, rfile, args.keys.split(
                 ','), drop_dupl=True, howjoin=args.joinmethod)
+
+    if args.nulldict:
+        dfout = fillnull(dfout,args.nulldict)
+
     if args.filter:
         dfout = filter(dfout, args.filter)
 

@@ -134,5 +134,5 @@ python esJson2csv -j ${tmpdir}/${topic}.json -o ${csvdir}/${topic}_${begindate}.
 #python splitcsv.py -f ${csvdir}/${topic}.csv -l -s 1 -t 0 -p ${topic} -S $begindate -o ${spdatadir}
 source /root/ipocPython/bin/activate
 topic1=linux_logon
-python transcsv.py -f ${csvdir}/${topic1}_${begindate}.csv -j -k host,ses -J ${csvdir}/${topic}_${begindate}.csv  -o ${csvdir}/linux_login_${begindate}.csv
-python transcsv.py -f ${csvdir}/${topic1}_${begindate}.csv -j -k host,ses -J ${csvdir}/${topic}_${begindate}.csv --filter "dp['logtime']<=dp['logouttime']" --sortkey host,logtime,ses,logouttime --asclist 1,1,1,1 --removeby logtime,host,ses -o ${spdatadir} -d logtime,logouttime -s host --prefix linux_login --suffix $begindate
+python transcsv.py -f ${csvdir}/${topic1}_${begindate}.csv -j -k host,ses -J ${csvdir}/${topic}_${begindate}.csv --nulldict "{'logouttime':'2099-12-30T00:00:00.000Z'}" -o ${csvdir}/linux_login_${begindate}.csv
+python transcsv.py -f ${csvdir}/${topic1}_${begindate}.csv -j -k host,ses -J ${csvdir}/${topic}_${begindate}.csv --nulldict "{'logouttime':'2099-12-30T00:00:00.000Z'}" --filter "dp['logtime']<=dp['logouttime']" --sortkey host,logtime,ses,logouttime --asclist 1,1,1,1 --removeby logtime,host,ses -o ${spdatadir} -d logtime,logouttime -r -s host --prefix linux_login --suffix $begindate
