@@ -16,6 +16,7 @@ def str2epoch(datestr, dateformat):
 
 def csvjoin(df_left, df_right, keys, drop_dupl=True, howjoin='left'):
     if drop_dupl:
+        # 根据所有字段去重
         df_left = df_left.drop_duplicates()
         df_right = df_right.drop_duplicates()
     #dfright = dfright.loc[:,['logtime','ses']]
@@ -26,13 +27,10 @@ def csvjoin(df_left, df_right, keys, drop_dupl=True, howjoin='left'):
     return f
 
 
-"""
-csvjoin(r'E:\\ShareDisk\\es2csv.20181210\\es2csv\\csv\\linux_logon.csv',r'E:\\ShareDisk\\es2csv.20181210\\es2csv\\csv\\linux_logout.csv',
-['host','ses','ip','app','auid']
-)
-"""
+#csvjoin(r'E:\\ShareDisk\\es2csv.20181210\\es2csv\\csv\\linux_logon.csv',r'E:\\ShareDisk\\es2csv.20181210\\es2csv\\csv\\linux_logout.csv', ['host','ses','ip','app','auid'])
 
 def filter(dp, expression):
+    """根据表达式进行过滤"""
     if expression:
         try:
             outdp = dp[eval(expression)]
@@ -43,14 +41,17 @@ def filter(dp, expression):
 
 
 def output(indp, out, splitindex=None, datefields=None, dateformat='%Y-%m-%dT%H:%M:%S.%fZ', prefix='', suffix='', removedup=True):
+    # 根据所有字段去重
     if removedup:
         indp.drop_duplicates()
+    # 有日期类型需要转换
     if datefields:
         # dateformat="%Y-%m-%dT%H:%M:%S.%fZ"
         def func(x):
             try:
                 res = long(time.mktime(time.strptime(x, dateformat)))
             except:
+                # 对于无法转换的，设置为0,此处需要优化改进
                 res = 0
             return res
         datefields = datefields.split(',')
@@ -58,6 +59,7 @@ def output(indp, out, splitindex=None, datefields=None, dateformat='%Y-%m-%dT%H:
             indp[d] = indp[d].apply(func)
             #indp[d] = indp[d].astype(object)
     if splitindex:
+        #需要按照指定key拆分文件
         #indp = indp.set_index('host')
         # print indp
         keys = indp[splitindex].unique()
@@ -67,6 +69,7 @@ def output(indp, out, splitindex=None, datefields=None, dateformat='%Y-%m-%dT%H:
             tmp.to_csv(os.path.join(out, '%s-%s-%s.csv' %
                                     (prefix, k, suffix)), index=False)
     else:
+        #正常输出
         indp.to_csv(out, index=False)
 
 
@@ -131,6 +134,7 @@ def main():
         if args.asclist:
             al = map(int,args.asclist.split(','))
         else:
+            # 没有给出，默认全部是按照1升序
             al = [1 for n in range(len(sk))]
         dfout = dfout.sort_values(by=sk,ascending=al)
 
